@@ -58,6 +58,10 @@ void setup() {
 
 
 void loop() {
+  // You must call the refresh method at least once per second to
+  // keep a latent charge from building up within the Liquid Crystal cells.
+  sharpDisplay.refresh();
+  delay(500);
 }
 
 
