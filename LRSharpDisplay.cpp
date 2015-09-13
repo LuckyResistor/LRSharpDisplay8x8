@@ -286,6 +286,7 @@ void SharpDisplay::refresh()
     }
     sendByteLSB(0x00);
     digitalWrite(gChipSelectPin, LOW);
+    clearScreenUpdate();
 }
 
     
