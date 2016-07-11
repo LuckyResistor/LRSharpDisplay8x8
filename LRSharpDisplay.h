@@ -28,10 +28,13 @@ namespace lr {
 
 /// This class is a compact driver for the LS027B7DH01A display from Sharp.
 ///
-/// The driver uses fixed 25x15 characters to show text on the display.
-/// You can use special characters to draw simple boxes and lines.
+/// The driver uses fixed 8x8 characters which are scaled to 16x16 pixel
+/// to show text on the display. The text is drawn using a grid of 25x15
+/// characters. There is only text, but you can use special characters
+/// to draw simple boxes and lines.
 ///
-/// This special version scales the 8x8 pixel font to 16x16 pixel.
+/// The main goal of this driver is to keep the RAM footprint as low as
+/// possible.
 ///
 /// Warning! This version was never tested with an actual display. Use
 /// it on your own risk.
