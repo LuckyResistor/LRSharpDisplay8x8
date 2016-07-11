@@ -1,7 +1,7 @@
 //
 // Lucky Resistor's Sharp Display Driver 8x8 Pixel
 // ---------------------------------------------------------------------------
-// (c)2015 by Lucky Resistor. See LICENSE for details.
+// (c)2016 by Lucky Resistor. See LICENSE for details.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -50,9 +50,9 @@ static const uint8_t CMD_VCOM = 0x40;
 static uint8_t gVComBit;
 
     
-// The array with the 12x12 screen.
-static const uint8_t gScreenHeight = 12;
-static const uint8_t gScreenWidth = 12;
+// The array with the 15x25 screen.
+static const uint8_t gScreenHeight = 15;
+static const uint8_t gScreenWidth = 25;
 static uint8_t gScreenCharacters[gScreenHeight*gScreenWidth];
 static const uint8_t gScreenRowRequiresUpdateSize = gScreenHeight/8+1;
 static uint8_t gScreenRowRequiresUpdate[gScreenRowRequiresUpdateSize];
@@ -108,6 +108,30 @@ inline static void setDataHigh()
 static void sendByteMSB(uint8_t byte)
 {
     for (uint8_t i = 0; i < 8; ++i) {
+        setClockLow();
+        if (byte & 0x80) {
+            setDataHigh();
+        } else {
+            setDataLow();
+        }
+        setClockHigh();
+        byte <<= 1;
+    }
+    setClockLow();
+}
+
+
+// This method sends a single byte MSB first to the display
+static void sendByteMSBx2(uint8_t byte)
+{
+    for (uint8_t i = 0; i < 8; ++i) {
+        setClockLow();
+        if (byte & 0x80) {
+            setDataHigh();
+        } else {
+            setDataLow();
+        }
+        setClockHigh();
         setClockLow();
         if (byte & 0x80) {
             setDataHigh();
@@ -267,20 +291,22 @@ void SharpDisplay::refresh()
         if (isRowMarkedForUpdate(row)) {
             // Draw the row pixel row by pixel row
             for (uint8_t pixelRow = 0; pixelRow < gCharacterHeight; ++pixelRow) {
-                sendByteLSB(row*gCharacterHeight+pixelRow+1);
-                for (uint8_t column = 0; column < gScreenWidth; ++column) {
-                    const uint8_t screenData = *(getCharacterPosition(row, column));
-                    const uint8_t characterIndex = (screenData & gTextCharacterMask);
-                    uint16_t characterStart = characterIndex;
-                    characterStart *= gCharacterHeight;
-                    characterStart += pixelRow;
-                    uint8_t pixelMask = pgm_read_byte(gTextFont+characterStart);
-                    if ((screenData & gTextFlagInverse) != 0) { // Inverse character?
-                        pixelMask = ~pixelMask;
+                for (uint8_t repeat = 0; repeat < 2; ++repeat) {
+                    sendByteLSB(row*gCharacterHeight*2+pixelRow*2+repeat+1);
+                    for (uint8_t column = 0; column < gScreenWidth; ++column) {
+                        const uint8_t screenData = *(getCharacterPosition(row, column));
+                        const uint8_t characterIndex = (screenData & gTextCharacterMask);
+                        uint16_t characterStart = characterIndex;
+                        characterStart *= gCharacterHeight;
+                        characterStart += pixelRow;
+                        uint8_t pixelMask = pgm_read_byte(gTextFont+characterStart);
+                        if ((screenData & gTextFlagInverse) != 0) { // Inverse character?
+                            pixelMask = ~pixelMask;
+                        }
+                        sendByteMSBx2(pixelMask);
                     }
-                    sendByteMSB(pixelMask);
+                    sendByteLSB(0x00);
                 }
-                sendByteLSB(0x00);
             }
         }
     }

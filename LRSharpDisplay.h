@@ -1,8 +1,8 @@
 #pragma once
 //
-// Lucky Resistor's Sharp Display Driver 8x8 Pixel
+// Lucky Resistor's Sharp Display Driver 400x240 Pixel - Scaled x2
 // ---------------------------------------------------------------------------
-// (c)2015 by Lucky Resistor. See LICENSE for details.
+// (c)2016 by Lucky Resistor. See LICENSE for details.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,14 +26,17 @@
 namespace lr {
 
 
-/// This class is a compact driver for the LS013B4DN04 display from Sharp.
+/// This class is a compact driver for the LS027B7DH01A display from Sharp.
 ///
-/// The driver uses fixed 8x8 pixel characters to show text on the display.
+/// The driver uses fixed 25x15 characters to show text on the display.
 /// You can use special characters to draw simple boxes and lines.
 ///
-/// See http://luckyresistor.me for details.
+/// This special version scales the 8x8 pixel font to 16x16 pixel.
 ///
-/// You can buy the display from Adafruit: http://www.adafruit.com/products/1393
+/// Warning! This version was never tested with an actual display. Use
+/// it on your own risk.
+///
+/// See http://luckyresistor.me for details.
 ///
 class SharpDisplay
 {
@@ -83,11 +86,11 @@ public:
     
     /// Get the width of the display in characters.
     ///
-    inline uint8_t getScreenWidth() const { return 12; }
+    inline uint8_t getScreenWidth() const { return 25; }
     
     /// Get the height of the display in characters.
     ///
-    inline uint8_t getScreenHeight() const { return 12; }
+    inline uint8_t getScreenHeight() const { return 15; }
 
     /// Clears the display.
     ///
